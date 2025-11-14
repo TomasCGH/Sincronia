@@ -1,0 +1,13 @@
+co.edu.uco.backendvictus:backend-victus:jar:0.0.1-SNAPSHOT
++- com.azure.spring:spring-cloud-azure-starter-keyvault-secrets:jar:5.6.0:compile
+|  +- com.azure.spring:spring-cloud-azure-starter:jar:5.6.0:compile
+|  |  \- com.azure.spring:spring-cloud-azure-autoconfigure:jar:5.6.0:compile
+|  |     \- com.azure.spring:spring-cloud-azure-service:jar:5.6.0:compile
+|  |        \- com.azure.spring:spring-cloud-azure-core:jar:5.6.0:compile
+|  |           +- com.azure:azure-core-amqp:jar:2.8.9:compile
+|  |           \- com.azure:azure-core-management:jar:1.11.5:compile
+|  \- com.azure:azure-security-keyvault-secrets:jar:4.7.0:compile
+|     \- com.azure:azure-json:jar:1.1.0:compile
+\- com.azure:azure-identity:jar:1.10.1:compile
+   +- com.azure:azure-core:jar:1.43.0:compile
+   \- com.azure:azure-core-http-netty:jar:1.13.7:compile
