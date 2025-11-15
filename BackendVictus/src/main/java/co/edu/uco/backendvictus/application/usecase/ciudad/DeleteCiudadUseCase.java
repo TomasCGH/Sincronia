@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
 
-import co.edu.uco.backendvictus.application.dto.ciudad.CiudadEvento;
-import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.mapper.CiudadApplicationMapper;
 import co.edu.uco.backendvictus.application.port.out.ciudad.CiudadEventoPublisher;
 import co.edu.uco.backendvictus.crosscutting.exception.ApplicationException;
@@ -33,6 +31,6 @@ public class DeleteCiudadUseCase {
                 .switchIfEmpty(Mono.error(new ApplicationException("Ciudad no encontrada")))
                 .flatMap(ciudad -> ciudadRepository.deleteById(id)
                         .thenReturn(mapper.toResponse(ciudad)))
-                .flatMap(resp -> eventoPublisher.publish(new CiudadEvento(TipoEvento.DELETED, resp)));
+                .flatMap(eventoPublisher::emitDeleted);
     }
 }

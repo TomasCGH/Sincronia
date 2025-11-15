@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import co.edu.uco.backendvictus.application.dto.departamento.DepartamentoCreateRequest;
-import co.edu.uco.backendvictus.application.dto.departamento.DepartamentoEvento;
 import co.edu.uco.backendvictus.application.dto.departamento.DepartamentoResponse;
-import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.mapper.DepartamentoApplicationMapper;
 import co.edu.uco.backendvictus.application.usecase.UseCase;
 import co.edu.uco.backendvictus.application.port.out.departamento.DepartamentoEventoPublisher;
@@ -42,6 +40,6 @@ public class CreateDepartamentoUseCase implements UseCase<DepartamentoCreateRequ
                 .map(pais -> mapper.toDomain(null, request, pais))
                 .flatMap(departamentoRepository::save)
                 .map(mapper::toResponse)
-                .flatMap(resp -> eventoPublisher.publish(new DepartamentoEvento(TipoEvento.CREATED, resp)).thenReturn(resp));
+                .flatMap(resp -> eventoPublisher.emitCreated(resp).thenReturn(resp));
     }
 }

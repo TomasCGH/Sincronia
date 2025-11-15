@@ -23,5 +23,6 @@ public abstract class CiudadApplicationMapper {
     }
 
     @Mapping(target = "departamentoId", source = "departamento.id")
+    @Mapping(target = "departamentoNombre", source = "departamento.nombre")
     public abstract CiudadResponse toResponse(Ciudad ciudad);
 }

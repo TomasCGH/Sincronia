@@ -116,9 +116,9 @@ public class PostgresNotifyListener {
         try {
             final JsonNode root = objectMapper.readTree(payload);
             final String tipoRaw = root.path("tipo").asText(null);
-            final JsonNode dataNode = root.path("data");
+            final JsonNode dataNode = root.path("payload");
             if (dataNode.isMissingNode() || dataNode.isNull()) {
-                LOGGER.warn("[LISTEN] Payload inválido, no contiene 'data': {}", payload);
+                LOGGER.warn("[LISTEN] Payload inválido, no contiene 'payload': {}", payload);
                 return Mono.empty();
             }
 
