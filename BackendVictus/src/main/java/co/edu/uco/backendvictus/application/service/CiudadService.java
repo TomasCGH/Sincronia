@@ -19,7 +19,4 @@ public class CiudadService {
         return listCiudadUseCase.execute();
     }
 
-    public Flux<CiudadResponse> streamCiudades() {
-        return listarCiudades();
-    }
 }

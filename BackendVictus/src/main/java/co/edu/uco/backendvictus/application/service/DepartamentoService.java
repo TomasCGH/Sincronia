@@ -19,7 +19,4 @@ public class DepartamentoService {
         return listDepartamentoUseCase.execute();
     }
 
-    public Flux<DepartamentoResponse> streamDepartamentos() {
-        return listarDepartamentos();
-    }
 }

@@ -1,12 +1,16 @@
 package co.edu.uco.backendvictus.infrastructure.primary.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.edu.uco.backendvictus.application.dto.ciudad.CiudadEvento;
 import co.edu.uco.backendvictus.application.dto.ciudad.CiudadResponse;
+import co.edu.uco.backendvictus.application.port.out.ciudad.CiudadEventoPublisher;
 import co.edu.uco.backendvictus.application.service.CiudadService;
 import reactor.core.publisher.Flux;
 
@@ -15,9 +19,12 @@ import reactor.core.publisher.Flux;
 public class CiudadStreamController {
 
     private final CiudadService ciudadService;
+    private final CiudadEventoPublisher eventoPublisher;
 
-    public CiudadStreamController(final CiudadService ciudadService) {
+    public CiudadStreamController(final CiudadService ciudadService,
+            final CiudadEventoPublisher eventoPublisher) {
         this.ciudadService = ciudadService;
+        this.eventoPublisher = eventoPublisher;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -26,11 +33,21 @@ public class CiudadStreamController {
     }
 
     @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<CiudadResponse>> streamCiudades() {
-        return ciudadService.streamCiudades()
-                .map(ciudad -> ServerSentEvent.<CiudadResponse>builder()
-                        .event("ciudad")
-                        .data(ciudad)
+    public ResponseEntity<Flux<ServerSentEvent<CiudadEvento>>> streamCiudades() {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setCacheControl("no-cache");
+        headers.add("X-Accel-Buffering", "no");
+        headers.add("Connection", "keep-alive");
+
+        Flux<ServerSentEvent<CiudadEvento>> body = eventoPublisher.stream()
+                .map(evento -> ServerSentEvent.<CiudadEvento>builder()
+                        .event(evento.tipo().name())
+                        .data(evento)
                         .build());
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.TEXT_EVENT_STREAM)
+                .body(body);
     }
 }

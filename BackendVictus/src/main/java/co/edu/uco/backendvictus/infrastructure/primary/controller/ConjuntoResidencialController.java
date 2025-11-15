@@ -104,7 +104,7 @@ public class ConjuntoResidencialController {
 
         Flux<ServerSentEvent<ConjuntoEvento>> body = eventoPublisher.stream()
                 .map(evento -> ServerSentEvent.<ConjuntoEvento>builder()
-                        .event(evento.tipo())
+                        .event(evento.tipo().name())
                         .data(evento)
                         .build());
 

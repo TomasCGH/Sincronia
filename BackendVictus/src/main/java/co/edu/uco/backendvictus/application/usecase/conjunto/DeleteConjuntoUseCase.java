@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoEvento;
+import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoResponse;
 import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoEventoPublisher;
 import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoRepositoryPort;
@@ -32,7 +33,7 @@ public class DeleteConjuntoUseCase {
                             conjunto.getAdministrador().getId(), conjunto.getNombre(), conjunto.getDireccion(),
                             conjunto.getTelefono(), conjunto.getCiudad().getNombre(),
                             conjunto.getCiudad().getDepartamento().getNombre());
-                    return eventoPublisher.publish(new ConjuntoEvento("DELETED", payload))
+                    return eventoPublisher.publish(new ConjuntoEvento(TipoEvento.DELETED, payload))
                             .then(conjuntoRepository.deleteById(id));
                 });
     }

@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoCreateRequest;
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoEvento;
+import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoResponse;
 import co.edu.uco.backendvictus.application.mapper.ConjuntoApplicationMapper;
 import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoEventoPublisher;
@@ -103,7 +104,7 @@ public class CreateConjuntoUseCase implements UseCase<ConjuntoCreateRequest, Con
                             });
                 })
                 .map(mapper::toResponse)
-                .flatMap(resp -> eventoPublisher.publish(new ConjuntoEvento("CREATED", resp)).thenReturn(resp))
+                .flatMap(resp -> eventoPublisher.publish(new ConjuntoEvento(TipoEvento.CREATED, resp)).thenReturn(resp))
                 .onErrorResume(ApplicationException.class, Mono::error)
                 .onErrorResume(Exception.class, ex -> {
                     Throwable cause = ex;

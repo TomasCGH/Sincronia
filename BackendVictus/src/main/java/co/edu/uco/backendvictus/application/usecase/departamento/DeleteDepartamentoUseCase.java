@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
 
+import co.edu.uco.backendvictus.application.dto.departamento.DepartamentoEvento;
+import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
+import co.edu.uco.backendvictus.application.mapper.DepartamentoApplicationMapper;
+import co.edu.uco.backendvictus.application.port.out.departamento.DepartamentoEventoPublisher;
 import co.edu.uco.backendvictus.crosscutting.exception.ApplicationException;
 import co.edu.uco.backendvictus.domain.port.DepartamentoRepository;
 
@@ -13,14 +17,22 @@ import co.edu.uco.backendvictus.domain.port.DepartamentoRepository;
 public class DeleteDepartamentoUseCase {
 
     private final DepartamentoRepository departamentoRepository;
+    private final DepartamentoApplicationMapper mapper;
+    private final DepartamentoEventoPublisher eventoPublisher;
 
-    public DeleteDepartamentoUseCase(final DepartamentoRepository departamentoRepository) {
+    public DeleteDepartamentoUseCase(final DepartamentoRepository departamentoRepository,
+            final DepartamentoApplicationMapper mapper,
+            final DepartamentoEventoPublisher eventoPublisher) {
         this.departamentoRepository = departamentoRepository;
+        this.mapper = mapper;
+        this.eventoPublisher = eventoPublisher;
     }
 
     public Mono<Void> execute(final UUID id) {
         return departamentoRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ApplicationException("Departamento no encontrado")))
-                .then(departamentoRepository.deleteById(id));
+                .flatMap(departamento -> departamentoRepository.deleteById(id)
+                        .thenReturn(mapper.toResponse(departamento)))
+                .flatMap(resp -> eventoPublisher.publish(new DepartamentoEvento(TipoEvento.DELETED, resp)));
     }
 }

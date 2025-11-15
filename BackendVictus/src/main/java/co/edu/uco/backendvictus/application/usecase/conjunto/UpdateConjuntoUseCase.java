@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoEvento;
+import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoResponse;
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoUpdateRequest;
 import co.edu.uco.backendvictus.application.mapper.ConjuntoApplicationMapper;
@@ -50,6 +51,6 @@ public class UpdateConjuntoUseCase implements UseCase<ConjuntoUpdateRequest, Con
                         request.telefono())))
                 .flatMap(conjuntoRepository::save)
                 .map(mapper::toResponse)
-                .flatMap(resp -> eventoPublisher.publish(new ConjuntoEvento("UPDATED", resp)).thenReturn(resp));
+                .flatMap(resp -> eventoPublisher.publish(new ConjuntoEvento(TipoEvento.UPDATED, resp)).thenReturn(resp));
     }
 }
