@@ -30,7 +30,7 @@ public abstract class ConjuntoApplicationMapper {
     @Mapping(target = "ciudadId", source = "ciudad.id")
     @Mapping(target = "departamentoId", source = "ciudad.departamento.id")
     @Mapping(target = "administradorId", source = "administrador.id")
-    @Mapping(target = "nombreCiudad", source = "ciudad.nombre")
-    @Mapping(target = "nombreDepartamento", source = "ciudad.departamento.nombre")
+    @Mapping(target = "ciudadNombre", source = "ciudad.nombre")
+    @Mapping(target = "departamentoNombre", source = "ciudad.departamento.nombre")
     public abstract ConjuntoResponse toResponse(ConjuntoResidencial conjuntoResidencial);
 }

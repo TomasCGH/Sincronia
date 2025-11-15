@@ -22,6 +22,8 @@ public abstract class CiudadApplicationMapper {
         return Ciudad.create(request.id(), request.nombre(), departamento);
     }
 
+    @Mapping(target = "ciudadId", source = "id")
+    @Mapping(target = "ciudadNombre", source = "nombre")
     @Mapping(target = "departamentoId", source = "departamento.id")
     @Mapping(target = "departamentoNombre", source = "departamento.nombre")
     public abstract CiudadResponse toResponse(Ciudad ciudad);

@@ -138,15 +138,15 @@ public class PostgresNotifyListener {
         return switch (channel) {
             case CH_CONJUNTO -> {
                 final ConjuntoResponse data = objectMapper.convertValue(dataNode, ConjuntoResponse.class);
-                yield conjuntoPublisher.publish(new ConjuntoEvento(tipo, data));
+                yield conjuntoPublisher.publish(ConjuntoEvento.of(tipo, data));
             }
             case CH_DEPARTAMENTO -> {
                 final DepartamentoResponse data = objectMapper.convertValue(dataNode, DepartamentoResponse.class);
-                yield departamentoPublisher.publish(new DepartamentoEvento(tipo, data));
+                yield departamentoPublisher.publish(DepartamentoEvento.of(tipo, data));
             }
             case CH_CIUDAD -> {
                 final CiudadResponse data = objectMapper.convertValue(dataNode, CiudadResponse.class);
-                yield ciudadPublisher.publish(new CiudadEvento(tipo, data));
+                yield ciudadPublisher.publish(CiudadEvento.of(tipo, data));
             }
             case CH_ADMIN -> {
                 LOGGER.info("[LISTEN] Evento de administrador recibido: {}", dataNode);

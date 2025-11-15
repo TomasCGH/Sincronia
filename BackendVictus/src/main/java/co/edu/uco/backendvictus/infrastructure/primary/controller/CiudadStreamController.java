@@ -43,7 +43,7 @@ public class CiudadStreamController {
 
         Flux<ServerSentEvent<CiudadEvento>> eventos = eventoPublisher.stream()
                 .map(evento -> ServerSentEvent.<CiudadEvento>builder()
-                        .event(evento.tipo().name())
+                        .event(evento.getTipo())
                         .data(evento)
                         .build());
 

@@ -22,6 +22,8 @@ public abstract class DepartamentoApplicationMapper {
         return Departamento.create(request.id(), request.nombre(), pais);
     }
 
+    @Mapping(target = "departamentoId", source = "id")
+    @Mapping(target = "departamentoNombre", source = "nombre")
     @Mapping(target = "paisId", source = "pais.id")
     public abstract DepartamentoResponse toResponse(Departamento departamento);
 }
