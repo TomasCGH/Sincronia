@@ -1,4 +1,6 @@
 package co.edu.uco.backendvictus.application.dto.conjunto;
 
-public record ConjuntoEvento(String tipo, ConjuntoResponse payload) {
+import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
+
+public record ConjuntoEvento(TipoEvento tipo, ConjuntoResponse payload) {
 }

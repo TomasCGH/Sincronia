@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import co.edu.uco.backendvictus.application.dto.departamento.DepartamentoCreateRequest;
+import co.edu.uco.backendvictus.application.dto.departamento.DepartamentoEvento;
 import co.edu.uco.backendvictus.application.dto.departamento.DepartamentoResponse;
+import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.mapper.DepartamentoApplicationMapper;
 import co.edu.uco.backendvictus.application.usecase.UseCase;
+import co.edu.uco.backendvictus.application.port.out.departamento.DepartamentoEventoPublisher;
 import co.edu.uco.backendvictus.crosscutting.exception.ApplicationException;
 import co.edu.uco.backendvictus.crosscutting.helpers.UuidGenerator;
 import co.edu.uco.backendvictus.domain.model.Departamento;
@@ -21,12 +24,15 @@ public class CreateDepartamentoUseCase implements UseCase<DepartamentoCreateRequ
     private final DepartamentoRepository departamentoRepository;
     private final PaisRepository paisRepository;
     private final DepartamentoApplicationMapper mapper;
+    private final DepartamentoEventoPublisher eventoPublisher;
 
     public CreateDepartamentoUseCase(final DepartamentoRepository departamentoRepository,
-            final PaisRepository paisRepository, final DepartamentoApplicationMapper mapper) {
+            final PaisRepository paisRepository, final DepartamentoApplicationMapper mapper,
+            final DepartamentoEventoPublisher eventoPublisher) {
         this.departamentoRepository = departamentoRepository;
         this.paisRepository = paisRepository;
         this.mapper = mapper;
+        this.eventoPublisher = eventoPublisher;
     }
 
     @Override
@@ -35,6 +41,7 @@ public class CreateDepartamentoUseCase implements UseCase<DepartamentoCreateRequ
                 .switchIfEmpty(Mono.error(new ApplicationException("Pais no encontrado")))
                 .map(pais -> mapper.toDomain(null, request, pais))
                 .flatMap(departamentoRepository::save)
-                .map(mapper::toResponse);
+                .map(mapper::toResponse)
+                .flatMap(resp -> eventoPublisher.publish(new DepartamentoEvento(TipoEvento.CREATED, resp)).thenReturn(resp));
     }
 }
