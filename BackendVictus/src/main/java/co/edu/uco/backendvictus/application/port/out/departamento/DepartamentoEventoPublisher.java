@@ -13,14 +13,14 @@ public interface DepartamentoEventoPublisher {
     Flux<DepartamentoEvento> stream();
 
     default Mono<Void> emitCreated(final DepartamentoResponse payload) {
-        return publish(new DepartamentoEvento(TipoEvento.CREATED, payload));
+        return publish(DepartamentoEvento.of(TipoEvento.CREATED, payload));
     }
 
     default Mono<Void> emitUpdated(final DepartamentoResponse payload) {
-        return publish(new DepartamentoEvento(TipoEvento.UPDATED, payload));
+        return publish(DepartamentoEvento.of(TipoEvento.UPDATED, payload));
     }
 
     default Mono<Void> emitDeleted(final DepartamentoResponse payload) {
-        return publish(new DepartamentoEvento(TipoEvento.DELETED, payload));
+        return publish(DepartamentoEvento.of(TipoEvento.DELETED, payload));
     }
 }

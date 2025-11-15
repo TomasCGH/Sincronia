@@ -43,7 +43,7 @@ public class DepartamentoStreamController {
 
         Flux<ServerSentEvent<DepartamentoEvento>> eventos = eventoPublisher.stream()
                 .map(evento -> ServerSentEvent.<DepartamentoEvento>builder()
-                        .event(evento.tipo().name())
+                        .event(evento.getTipo())
                         .data(evento)
                         .build());
 

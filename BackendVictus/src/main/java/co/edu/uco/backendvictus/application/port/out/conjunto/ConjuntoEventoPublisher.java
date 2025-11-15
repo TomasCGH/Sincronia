@@ -13,14 +13,14 @@ public interface ConjuntoEventoPublisher {
     Flux<ConjuntoEvento> stream();
 
     default Mono<Void> emitCreated(final ConjuntoResponse payload) {
-        return publish(new ConjuntoEvento(TipoEvento.CREATED, payload));
+        return publish(ConjuntoEvento.of(TipoEvento.CREATED, payload));
     }
 
     default Mono<Void> emitUpdated(final ConjuntoResponse payload) {
-        return publish(new ConjuntoEvento(TipoEvento.UPDATED, payload));
+        return publish(ConjuntoEvento.of(TipoEvento.UPDATED, payload));
     }
 
     default Mono<Void> emitDeleted(final ConjuntoResponse payload) {
-        return publish(new ConjuntoEvento(TipoEvento.DELETED, payload));
+        return publish(ConjuntoEvento.of(TipoEvento.DELETED, payload));
     }
 }

@@ -13,14 +13,14 @@ public interface CiudadEventoPublisher {
     Flux<CiudadEvento> stream();
 
     default Mono<Void> emitCreated(final CiudadResponse payload) {
-        return publish(new CiudadEvento(TipoEvento.CREATED, payload));
+        return publish(CiudadEvento.of(TipoEvento.CREATED, payload));
     }
 
     default Mono<Void> emitUpdated(final CiudadResponse payload) {
-        return publish(new CiudadEvento(TipoEvento.UPDATED, payload));
+        return publish(CiudadEvento.of(TipoEvento.UPDATED, payload));
     }
 
     default Mono<Void> emitDeleted(final CiudadResponse payload) {
-        return publish(new CiudadEvento(TipoEvento.DELETED, payload));
+        return publish(CiudadEvento.of(TipoEvento.DELETED, payload));
     }
 }
