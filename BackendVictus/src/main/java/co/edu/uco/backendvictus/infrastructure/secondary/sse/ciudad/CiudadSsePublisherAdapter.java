@@ -21,9 +21,9 @@ public class CiudadSsePublisherAdapter implements CiudadEventoPublisher {
     public Mono<Void> publish(final CiudadEvento evento) {
         final Sinks.EmitResult result = sink.tryEmitNext(evento);
         if (result.isFailure()) {
-            LOGGER.warn("[SSE Ciudades] fallo emitiendo evento {} -> {}", evento.tipo(), result);
+            LOGGER.warn("[SSE Ciudades] fallo emitiendo evento {} -> {}", evento.getTipo(), result);
         } else {
-            LOGGER.info("[SSE Ciudades] evento emitido: {}", evento.tipo());
+            LOGGER.info("[SSE Ciudades] evento emitido: {}", evento.getTipo());
         }
         return Mono.empty();
     }

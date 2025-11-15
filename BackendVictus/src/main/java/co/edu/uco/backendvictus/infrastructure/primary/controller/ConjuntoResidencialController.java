@@ -38,6 +38,7 @@ import co.edu.uco.backendvictus.infrastructure.primary.response.ApiSuccessRespon
 import co.edu.uco.backendvictus.infrastructure.primary.response.ApiResponseHelper; // ✅ import helper
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 @RestController
 @RequestMapping("/uco-challenge/api/v1/conjuntos")
@@ -70,8 +71,12 @@ public class ConjuntoResidencialController {
     public Mono<ResponseEntity<ApiSuccessResponse<ConjuntoResponse>>> crear(
             @Valid @RequestBody final ConjuntoCreateRequest request) {
 
-        final ConjuntoCreateRequest sanitized = new ConjuntoCreateRequest(request.ciudadId(), request.administradorId(),
-                DataSanitizer.sanitizeText(request.nombre()), DataSanitizer.sanitizeText(request.direccion()),
+        final ConjuntoCreateRequest sanitized = new ConjuntoCreateRequest(
+                request.departamentoId(),
+                request.ciudadId(),
+                request.administradorId(),
+                DataSanitizer.sanitizeText(request.nombre()),
+                DataSanitizer.sanitizeText(request.direccion()),
                 DataSanitizer.sanitizeText(request.telefono()));
 
         return createConjuntoUseCase.execute(sanitized)
@@ -115,9 +120,13 @@ public class ConjuntoResidencialController {
                         .comment("keep-alive")
                         .build());
 
-        Flux<ServerSentEvent<ConjuntoEvento>> body = Flux.merge(eventos, heartbeat);
+        Flux<ServerSentEvent<ConjuntoEvento>> resilientBody = Flux.merge(eventos, heartbeat)
+                .onBackpressureBuffer()
+                .retryWhen(Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(2))
+                        .maxBackoff(Duration.ofSeconds(30))
+                        .jitter(0.2));
 
-        return ResponseEntity.ok().headers(headers).contentType(MediaType.TEXT_EVENT_STREAM).body(body);
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.TEXT_EVENT_STREAM).body(resilientBody);
     }
 
     @PutMapping("/{id}")
@@ -141,8 +150,8 @@ public class ConjuntoResidencialController {
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<ApiSuccessResponse<Void>>> eliminar(@PathVariable("id") final UUID id) {
         return deleteConjuntoUseCase.execute(id)
-                .thenReturn(ApiResponseHelper.emptySuccess()) // ✅ sin null ni warnings de tipo
-                .map(body -> ResponseEntity.ok(body));
+                .thenReturn(ApiResponseHelper.emptySuccess())
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}/viviendas")
@@ -152,8 +161,8 @@ public class ConjuntoResidencialController {
             @RequestParam(name = "size", required = false) final Integer size) {
         return listViviendaUseCase.execute(new ViviendaFilterRequest(conjuntoId, null, null, null, page, size))
                 .map(ApiSuccessResponse::of)
-                .map(body -> ResponseEntity.ok(body));
-}
+                .map(ResponseEntity::ok);
+    }
 
     private static HttpHeaders buildSseHeaders() {
         HttpHeaders headers = new HttpHeaders();

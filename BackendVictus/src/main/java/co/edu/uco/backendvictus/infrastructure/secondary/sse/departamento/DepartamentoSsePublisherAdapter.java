@@ -21,9 +21,9 @@ public class DepartamentoSsePublisherAdapter implements DepartamentoEventoPublis
     public Mono<Void> publish(final DepartamentoEvento evento) {
         final Sinks.EmitResult result = sink.tryEmitNext(evento);
         if (result.isFailure()) {
-            LOGGER.warn("[SSE Departamentos] fallo emitiendo evento {} -> {}", evento.tipo(), result);
+            LOGGER.warn("[SSE Departamentos] fallo emitiendo evento {} -> {}", evento.getTipo(), result);
         } else {
-            LOGGER.info("[SSE Departamentos] evento emitido: {}", evento.tipo());
+            LOGGER.info("[SSE Departamentos] evento emitido: {}", evento.getTipo());
         }
         return Mono.empty();
     }

@@ -22,5 +22,18 @@ public abstract class AdministradorApplicationMapper {
                 request.primerApellido(), request.segundoApellido(), request.email(), request.telefono());
     }
 
-    public abstract AdministradorResponse toResponse(Administrador administrador);
+    public AdministradorResponse toResponse(final Administrador administrador) {
+        if (administrador == null) return null;
+        // Mapear todos los campos esperados por el DTO y un nombre completo calculado
+        return new AdministradorResponse(
+                administrador.getId(),
+                administrador.getPrimerNombre(),
+                administrador.getSegundoNombres(),
+                administrador.getPrimerApellido(),
+                administrador.getSegundoApellido(),
+                administrador.getEmail(),
+                administrador.getTelefono(),
+                administrador.getNombreCompleto()
+        );
+    }
 }

@@ -10,5 +10,6 @@ public record ConjuntoResponse(UUID id,
         String direccion,
         String telefono,
         String ciudadNombre,
-        String departamentoNombre) {
+        String departamentoNombre,
+        String administradorNombre) {
 }

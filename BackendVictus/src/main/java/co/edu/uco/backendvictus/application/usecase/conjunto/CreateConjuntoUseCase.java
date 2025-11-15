@@ -23,7 +23,6 @@ import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.port.AdministradorRepository;
 import co.edu.uco.backendvictus.domain.port.CiudadRepository;
 import co.edu.uco.backendvictus.infrastructure.secondary.client.MessageClient;
-import co.edu.uco.backendvictus.infrastructure.secondary.client.ParameterClient;
 
 @Service
 public class CreateConjuntoUseCase implements UseCase<ConjuntoCreateRequest, ConjuntoResponse> {
@@ -35,44 +34,46 @@ public class CreateConjuntoUseCase implements UseCase<ConjuntoCreateRequest, Con
     private final AdministradorRepository administradorRepository;
     private final ConjuntoApplicationMapper mapper;
     private final MessageClient messageClient;
-    private final ParameterClient parameterClient;
     private final ConjuntoEventoPublisher eventoPublisher;
 
     @Autowired
     public CreateConjuntoUseCase(final ConjuntoRepositoryPort conjuntoRepository,
             final CiudadRepository ciudadRepository, final AdministradorRepository administradorRepository,
             final ConjuntoApplicationMapper mapper, final MessageClient messageClient,
-            final ParameterClient parameterClient, final ConjuntoEventoPublisher eventoPublisher) {
+            final ConjuntoEventoPublisher eventoPublisher) {
         this.conjuntoRepository = conjuntoRepository;
         this.ciudadRepository = ciudadRepository;
         this.administradorRepository = administradorRepository;
         this.mapper = mapper;
         this.messageClient = messageClient;
-        this.parameterClient = parameterClient;
         this.eventoPublisher = eventoPublisher;
     }
 
     @Override
     public Mono<ConjuntoResponse> execute(final ConjuntoCreateRequest request) {
 
-        if (request.ciudadId() == null || request.administradorId() == null) {
-            return this.<ConjuntoResponse>errorFromMessage("validation.required.uuid");
+        // Validaciones específicas por campo cuando el caso de uso se invoca directamente
+        if (request.ciudadId() == null) {
+            return this.errorFromMessage("validation.required.ciudad");
+        }
+        if (request.administradorId() == null) {
+            return this.errorFromMessage("validation.required.administrador");
         }
 
         if (request.telefono() == null || request.telefono().isBlank()) {
-            return this.<ConjuntoResponse>errorFromMessage("validation.required.telefono");
+            return this.errorFromMessage("validation.required.telefono");
         }
 
-        if (!request.telefono().matches("^[0-9]+$")) {
-            return this.<ConjuntoResponse>errorFromMessage("validation.format.telefono");
+        if (!request.telefono().matches("^\\d+$")) {
+            return this.errorFromMessage("validation.format.telefono");
         }
 
         if (request.telefono().length() < 7 || request.telefono().length() > 10) {
-            return this.<ConjuntoResponse>errorFromMessage("validation.length.telefono");
+            return this.errorFromMessage("validation.length.telefono");
         }
 
         if (request.direccion() == null || request.direccion().isBlank()) {
-            return this.<ConjuntoResponse>errorFromMessage("validation.required.direccion");
+            return this.errorFromMessage("validation.required.direccion");
         }
 
         final Mono<Ciudad> ciudadMono = ciudadRepository.findById(request.ciudadId())
@@ -112,8 +113,8 @@ public class CreateConjuntoUseCase implements UseCase<ConjuntoCreateRequest, Con
                         }
                         cause = cause.getCause();
                     }
-                    LOGGER.error("Error inesperado en CreateConjuntoUseCase: {}", ex.getMessage());
-                    return this.<ConjuntoResponse>errorFromMessage("domain.general.error");
+                    LOGGER.error("Error inesperado en CreateConjuntoUseCase", ex);
+                    return this.errorFromMessage("domain.general.error");
                 });
     }
 

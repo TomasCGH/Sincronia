@@ -1,6 +1,7 @@
 package co.edu.uco.backendvictus.infrastructure.primary.controller;
 
 import java.time.Duration;
+import java.util.Map;
 
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -12,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.edu.uco.backendvictus.application.dto.ciudad.CiudadEvento;
+import co.edu.uco.backendvictus.application.dto.ciudad.CiudadPublicResponse;
 import co.edu.uco.backendvictus.application.dto.ciudad.CiudadResponse;
 import co.edu.uco.backendvictus.application.port.out.ciudad.CiudadEventoPublisher;
 import co.edu.uco.backendvictus.application.service.CiudadService;
 import reactor.core.publisher.Flux;
+import reactor.util.retry.Retry;
 
 @RestController
 @RequestMapping("/api/v1/ciudades")
@@ -33,30 +36,37 @@ public class CiudadStreamController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<CiudadResponse> listarCiudades() {
-        return ciudadService.listarCiudades();
+    public Flux<CiudadPublicResponse> listarCiudades() {
+        return ciudadService.listarCiudades()
+                .map(this::toPublicResponse);
     }
 
     @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public ResponseEntity<Flux<ServerSentEvent<CiudadEvento>>> streamCiudades() {
+    public ResponseEntity<Flux<ServerSentEvent<Map<String, Object>>>> streamCiudades() {
         final HttpHeaders headers = buildSseHeaders();
 
-        Flux<ServerSentEvent<CiudadEvento>> eventos = eventoPublisher.stream()
-                .map(evento -> ServerSentEvent.<CiudadEvento>builder()
+        Flux<ServerSentEvent<Map<String, Object>>> eventos = eventoPublisher.stream()
+                .map(evento -> ServerSentEvent.<Map<String, Object>>builder()
                         .event(evento.getTipo())
-                        .data(evento)
+                        .data(buildPublicEvent(evento))
                         .build());
 
-        Flux<ServerSentEvent<CiudadEvento>> heartbeat = Flux.interval(HEARTBEAT_INTERVAL)
-                .map(sequence -> ServerSentEvent.<CiudadEvento>builder()
+        Flux<ServerSentEvent<Map<String, Object>>> heartbeat = Flux.interval(HEARTBEAT_INTERVAL)
+                .map(sequence -> ServerSentEvent.<Map<String, Object>>builder()
                         .event("heartbeat")
                         .comment("keep-alive")
                         .build());
 
+        Flux<ServerSentEvent<Map<String, Object>>> resilientStream = Flux.merge(eventos, heartbeat)
+                .onBackpressureBuffer()
+                .retryWhen(Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(2))
+                        .maxBackoff(Duration.ofSeconds(30))
+                        .jitter(0.2));
+
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.TEXT_EVENT_STREAM)
-                .body(Flux.merge(eventos, heartbeat));
+                .body(resilientStream);
     }
 
     private static HttpHeaders buildSseHeaders() {
@@ -66,5 +76,22 @@ public class CiudadStreamController {
         headers.add("X-Accel-Buffering", "no");
         headers.add("Connection", "keep-alive");
         return headers;
+    }
+
+    // --- helpers locales ---
+    private CiudadPublicResponse toPublicResponse(final CiudadResponse r) {
+        if (r == null) {
+            return null;
+        }
+        return new CiudadPublicResponse(r.ciudadId(), r.ciudadNombre(), r.departamentoId());
+    }
+
+    private Map<String, Object> buildPublicEvent(final CiudadEvento evento) {
+        final CiudadResponse payload = evento.getPayload();
+        final CiudadPublicResponse publicPayload = toPublicResponse(payload);
+        return Map.of(
+                "tipo", evento.getTipo(),
+                "payload", publicPayload
+        );
     }
 }

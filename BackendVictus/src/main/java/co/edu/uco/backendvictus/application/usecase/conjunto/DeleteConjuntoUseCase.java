@@ -29,10 +29,18 @@ public class DeleteConjuntoUseCase {
                 .flatMap(conjunto -> {
                     final UUID ciudadId = conjunto.getCiudad().getId();
                     final UUID departamentoId = conjunto.getCiudad().getDepartamento().getId();
-                    ConjuntoResponse payload = new ConjuntoResponse(conjunto.getId(), ciudadId, departamentoId,
-                            conjunto.getAdministrador().getId(), conjunto.getNombre(), conjunto.getDireccion(),
-                            conjunto.getTelefono(), conjunto.getCiudad().getNombre(),
-                            conjunto.getCiudad().getDepartamento().getNombre());
+                    final String administradorNombre = conjunto.getAdministrador().getNombreCompleto();
+                    ConjuntoResponse payload = new ConjuntoResponse(
+                            conjunto.getId(),
+                            ciudadId,
+                            departamentoId,
+                            conjunto.getAdministrador().getId(),
+                            conjunto.getNombre(),
+                            conjunto.getDireccion(),
+                            conjunto.getTelefono(),
+                            conjunto.getCiudad().getNombre(),
+                            conjunto.getCiudad().getDepartamento().getNombre(),
+                            administradorNombre);
                     return eventoPublisher.emitDeleted(payload)
                             .then(conjuntoRepository.deleteById(id));
                 });

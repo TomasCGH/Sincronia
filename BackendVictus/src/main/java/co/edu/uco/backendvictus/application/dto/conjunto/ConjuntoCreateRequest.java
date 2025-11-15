@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record ConjuntoCreateRequest(
+        UUID departamentoId, // opcional, la ciudad determina el departamento
         @NotNull(message = "validation.required.ciudad")
         UUID ciudadId,
         @NotNull(message = "validation.required.administrador")
@@ -18,7 +19,7 @@ public record ConjuntoCreateRequest(
         @Size(min = 3, max = 150, message = "validation.size.direccion")
         String direccion,
         @NotBlank(message = "validation.required.telefono")
-        @Pattern(regexp = "^[0-9]+$", message = "validation.format.telefono")
+        @Pattern(regexp = "^\\d+$", message = "validation.format.telefono")
         @Size(min = 7, max = 10, message = "validation.length.telefono")
         String telefono) {
 }

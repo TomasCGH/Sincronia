@@ -1,39 +1,28 @@
 package co.edu.uco.backendvictus.infrastructure.config;
 
-import java.util.List;
-
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsWebFilter;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.util.pattern.PathPatternParser;
+import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 @Configuration
-public class CorsConfig {
+@EnableWebFlux
+public class CorsConfig implements WebFluxConfigurer {
 
-    @Bean
-    public CorsWebFilter corsWebFilter() {
-        // Configuración general (API REST normal)
-        CorsConfiguration general = new CorsConfiguration();
-        general.setAllowedOrigins(List.of("http://localhost:5174"));
-        general.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        general.setAllowedHeaders(List.of("*"));
-        general.setAllowCredentials(true);
+    private static final String FRONTEND_ORIGIN = "http://localhost:5174";
 
-        // Configuración específica para SSE: solo GET y sin credenciales
-        CorsConfiguration sse = new CorsConfiguration();
-        sse.setAllowedOrigins(List.of("http://localhost:5174"));
-        sse.setAllowedMethods(List.of("GET"));
-        sse.setAllowedHeaders(List.of("*"));
-        sse.setAllowCredentials(false);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new PathPatternParser());
-        source.registerCorsConfiguration("/api/**", general);
-        source.registerCorsConfiguration("/uco-challenge/**", general);
-        source.registerCorsConfiguration("/uco-challenge/api/v1/conjuntos/stream", sse);
-        source.registerCorsConfiguration("/api/v1/departamentos/stream", sse);
-        source.registerCorsConfiguration("/api/v1/ciudades/stream", sse);
-        return new CorsWebFilter(source);
+    @Override
+    public void addCorsMappings(final CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOrigins(FRONTEND_ORIGIN)
+                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                .allowedHeaders("Content-Type", "Authorization")
+                .allowCredentials(false);
+        registry.addMapping("/uco-challenge/**")
+                .allowedOrigins(FRONTEND_ORIGIN)
+                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                .allowedHeaders("Content-Type", "Authorization")
+                .allowCredentials(false);
     }
 }
+
