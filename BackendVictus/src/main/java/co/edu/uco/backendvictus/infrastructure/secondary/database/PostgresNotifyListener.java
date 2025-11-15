@@ -84,7 +84,7 @@ public class PostgresNotifyListener {
 
     private Flux<Void> listenFlux() {
         return Mono.from(connectionFactory.create())
-                .cast(PostgresqlConnection.class)
+                .ofType(PostgresqlConnection.class)
                 .flatMap(conn -> Mono.when(
                         Mono.from(conn.createStatement("LISTEN " + CH_CONJUNTO).execute()),
                         Mono.from(conn.createStatement("LISTEN " + CH_DEPARTAMENTO).execute()),

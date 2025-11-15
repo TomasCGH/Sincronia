@@ -67,11 +67,39 @@ public class ConjuntoRepositoryAdapter implements ConjuntoRepositoryPort {
 
     @Override
     public Mono<ConjuntoResidencial> save(final ConjuntoResidencial conjuntoResidencial) {
-        return repository.save(mapper.toEntity(conjuntoResidencial))
+        final String sql = "INSERT INTO conjunto_residencial (nombre, direccion, ciudad_id, administrador_id, telefono) "
+                + "VALUES (:nombre, :direccion, :ciudadId, :administradorId, :telefono) "
+                + "RETURNING id, nombre, direccion, ciudad_id, administrador_id, telefono";
+
+        return databaseClient.sql(sql)
+                .bind("nombre", conjuntoResidencial.getNombre())
+                .bind("direccion", conjuntoResidencial.getDireccion())
+                .bind("ciudadId", conjuntoResidencial.getCiudad().getId())
+                .bind("administradorId", conjuntoResidencial.getAdministrador().getId())
+                .bind("telefono", conjuntoResidencial.getTelefono())
+                .map((row, metadata) -> new ConjuntoResidencialEntity(
+                        row.get("id", java.util.UUID.class),
+                        row.get("nombre", String.class),
+                        row.get("direccion", String.class),
+                        row.get("ciudad_id", java.util.UUID.class),
+                        row.get("administrador_id", java.util.UUID.class),
+                        row.get("telefono", String.class)))
+                .one()
                 .flatMap(this::toDomain)
-                .onErrorMap(org.springframework.dao.DataIntegrityViolationException.class,
-                        e -> new co.edu.uco.backendvictus.crosscutting.exception.ApplicationException(
-                                "El teléfono ya está registrado en otro conjunto residencial", "database-constraint"));
+                .onErrorMap(org.springframework.dao.DataIntegrityViolationException.class, e -> {
+                    final String lower = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+                    if (lower.contains("telefono") || lower.contains("unique") || lower.contains("duplicate")) {
+                        return new co.edu.uco.backendvictus.crosscutting.exception.ApplicationException(
+                                "El teléfono ya está registrado en otro conjunto residencial", "database-constraint");
+                    }
+                    if (lower.contains("foreign key") || lower.contains("violates foreign key constraint")
+                            || lower.contains("fk_conjunto_ciudad") || lower.contains("fk_conjunto_administrador")) {
+                        return new co.edu.uco.backendvictus.crosscutting.exception.ApplicationException(
+                                "Referencia inválida a ciudad o administrador", "database-constraint");
+                    }
+                    return new co.edu.uco.backendvictus.crosscutting.exception.ApplicationException(
+                            "Error de integridad de datos al crear el conjunto residencial", e, "database-constraint");
+                });
     }
 
     @Override
