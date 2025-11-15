@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
 
-import co.edu.uco.backendvictus.application.dto.departamento.DepartamentoEvento;
-import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.mapper.DepartamentoApplicationMapper;
 import co.edu.uco.backendvictus.application.port.out.departamento.DepartamentoEventoPublisher;
 import co.edu.uco.backendvictus.crosscutting.exception.ApplicationException;
@@ -33,6 +31,6 @@ public class DeleteDepartamentoUseCase {
                 .switchIfEmpty(Mono.error(new ApplicationException("Departamento no encontrado")))
                 .flatMap(departamento -> departamentoRepository.deleteById(id)
                         .thenReturn(mapper.toResponse(departamento)))
-                .flatMap(resp -> eventoPublisher.publish(new DepartamentoEvento(TipoEvento.DELETED, resp)));
+                .flatMap(eventoPublisher::emitDeleted);
     }
 }

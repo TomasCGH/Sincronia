@@ -1,5 +1,6 @@
 package co.edu.uco.backendvictus.infrastructure.primary.controller;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.http.CacheControl;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,6 +42,8 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/uco-challenge/api/v1/conjuntos")
 public class ConjuntoResidencialController {
+
+    private static final Duration HEARTBEAT_INTERVAL = Duration.ofSeconds(15);
 
     private final CreateConjuntoUseCase createConjuntoUseCase;
     private final ListConjuntosUseCase listConjuntosUseCase;
@@ -97,16 +101,21 @@ public class ConjuntoResidencialController {
 
     @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<Flux<ServerSentEvent<ConjuntoEvento>>> streamEventos() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setCacheControl("no-cache");
-        headers.add("X-Accel-Buffering", "no");
-        headers.add("Connection", "keep-alive");
+        HttpHeaders headers = buildSseHeaders();
 
-        Flux<ServerSentEvent<ConjuntoEvento>> body = eventoPublisher.stream()
+        Flux<ServerSentEvent<ConjuntoEvento>> eventos = eventoPublisher.stream()
                 .map(evento -> ServerSentEvent.<ConjuntoEvento>builder()
                         .event(evento.tipo().name())
                         .data(evento)
                         .build());
+
+        Flux<ServerSentEvent<ConjuntoEvento>> heartbeat = Flux.interval(HEARTBEAT_INTERVAL)
+                .map(sequence -> ServerSentEvent.<ConjuntoEvento>builder()
+                        .event("heartbeat")
+                        .comment("keep-alive")
+                        .build());
+
+        Flux<ServerSentEvent<ConjuntoEvento>> body = Flux.merge(eventos, heartbeat);
 
         return ResponseEntity.ok().headers(headers).contentType(MediaType.TEXT_EVENT_STREAM).body(body);
     }
@@ -144,5 +153,14 @@ public class ConjuntoResidencialController {
         return listViviendaUseCase.execute(new ViviendaFilterRequest(conjuntoId, null, null, null, page, size))
                 .map(ApiSuccessResponse::of)
                 .map(body -> ResponseEntity.ok(body));
+}
+
+    private static HttpHeaders buildSseHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setCacheControl(CacheControl.noStore().mustRevalidate().getHeaderValue());
+        headers.setPragma("no-cache");
+        headers.add("X-Accel-Buffering", "no");
+        headers.add("Connection", "keep-alive");
+        return headers;
     }
 }

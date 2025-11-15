@@ -28,6 +28,7 @@ public abstract class ConjuntoApplicationMapper {
     }
 
     @Mapping(target = "ciudadId", source = "ciudad.id")
+    @Mapping(target = "departamentoId", source = "ciudad.departamento.id")
     @Mapping(target = "administradorId", source = "administrador.id")
     @Mapping(target = "nombreCiudad", source = "ciudad.nombre")
     @Mapping(target = "nombreDepartamento", source = "ciudad.departamento.nombre")

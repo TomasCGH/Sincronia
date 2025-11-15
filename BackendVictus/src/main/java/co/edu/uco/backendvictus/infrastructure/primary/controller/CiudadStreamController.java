@@ -1,5 +1,8 @@
 package co.edu.uco.backendvictus.infrastructure.primary.controller;
 
+import java.time.Duration;
+
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,8 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/api/v1/ciudades")
 public class CiudadStreamController {
 
+    private static final Duration HEARTBEAT_INTERVAL = Duration.ofSeconds(15);
+
     private final CiudadService ciudadService;
     private final CiudadEventoPublisher eventoPublisher;
 
@@ -34,20 +39,32 @@ public class CiudadStreamController {
 
     @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<Flux<ServerSentEvent<CiudadEvento>>> streamCiudades() {
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setCacheControl("no-cache");
-        headers.add("X-Accel-Buffering", "no");
-        headers.add("Connection", "keep-alive");
+        final HttpHeaders headers = buildSseHeaders();
 
-        Flux<ServerSentEvent<CiudadEvento>> body = eventoPublisher.stream()
+        Flux<ServerSentEvent<CiudadEvento>> eventos = eventoPublisher.stream()
                 .map(evento -> ServerSentEvent.<CiudadEvento>builder()
                         .event(evento.tipo().name())
                         .data(evento)
                         .build());
 
+        Flux<ServerSentEvent<CiudadEvento>> heartbeat = Flux.interval(HEARTBEAT_INTERVAL)
+                .map(sequence -> ServerSentEvent.<CiudadEvento>builder()
+                        .event("heartbeat")
+                        .comment("keep-alive")
+                        .build());
+
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.TEXT_EVENT_STREAM)
-                .body(body);
+                .body(Flux.merge(eventos, heartbeat));
+    }
+
+    private static HttpHeaders buildSseHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setCacheControl(CacheControl.noStore().mustRevalidate().getHeaderValue());
+        headers.setPragma("no-cache");
+        headers.add("X-Accel-Buffering", "no");
+        headers.add("Connection", "keep-alive");
+        return headers;
     }
 }

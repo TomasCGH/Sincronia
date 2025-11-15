@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import co.edu.uco.backendvictus.application.dto.ciudad.CiudadCreateRequest;
-import co.edu.uco.backendvictus.application.dto.ciudad.CiudadEvento;
 import co.edu.uco.backendvictus.application.dto.ciudad.CiudadResponse;
-import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.mapper.CiudadApplicationMapper;
 import co.edu.uco.backendvictus.application.usecase.UseCase;
 import co.edu.uco.backendvictus.application.port.out.ciudad.CiudadEventoPublisher;
@@ -42,6 +40,6 @@ public class CreateCiudadUseCase implements UseCase<CiudadCreateRequest, CiudadR
                 .map(departamento -> mapper.toDomain(null, request, departamento))
                 .flatMap(ciudadRepository::save)
                 .map(mapper::toResponse)
-                .flatMap(resp -> eventoPublisher.publish(new CiudadEvento(TipoEvento.CREATED, resp)).thenReturn(resp));
+                .flatMap(resp -> eventoPublisher.emitCreated(resp).thenReturn(resp));
     }
 }

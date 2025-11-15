@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Mono;
 
-import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoEvento;
-import co.edu.uco.backendvictus.application.dto.evento.TipoEvento;
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoResponse;
 import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoEventoPublisher;
 import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoRepositoryPort;
@@ -29,11 +27,13 @@ public class DeleteConjuntoUseCase {
         return conjuntoRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ApplicationException("Conjunto residencial no encontrado")))
                 .flatMap(conjunto -> {
-                    ConjuntoResponse payload = new ConjuntoResponse(conjunto.getId(), conjunto.getCiudad().getId(),
+                    final UUID ciudadId = conjunto.getCiudad().getId();
+                    final UUID departamentoId = conjunto.getCiudad().getDepartamento().getId();
+                    ConjuntoResponse payload = new ConjuntoResponse(conjunto.getId(), ciudadId, departamentoId,
                             conjunto.getAdministrador().getId(), conjunto.getNombre(), conjunto.getDireccion(),
                             conjunto.getTelefono(), conjunto.getCiudad().getNombre(),
                             conjunto.getCiudad().getDepartamento().getNombre());
-                    return eventoPublisher.publish(new ConjuntoEvento(TipoEvento.DELETED, payload))
+                    return eventoPublisher.emitDeleted(payload)
                             .then(conjuntoRepository.deleteById(id));
                 });
     }
