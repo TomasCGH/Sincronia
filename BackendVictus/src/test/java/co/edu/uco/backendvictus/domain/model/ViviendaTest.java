@@ -10,13 +10,22 @@ import org.junit.jupiter.api.Test;
 import co.edu.uco.backendvictus.crosscutting.exception.DomainException;
 import co.edu.uco.backendvictus.seeds.ViviendaFactory;
 
+// IMPORTS NECESARIOS
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.Vivienda;
+import co.edu.uco.backendvictus.domain.model.ViviendaTipo;
+import co.edu.uco.backendvictus.domain.model.ViviendaEstado;
+
 class ViviendaTest {
 
     @Test
     void shouldNormalizeNumeroToUpperCase() {
         final ConjuntoResidencial conjunto = ViviendaFactory.buildConjunto();
-        final Vivienda vivienda = Vivienda.create(UUID.randomUUID(), "a-101", ViviendaTipo.CASA,
-                ViviendaEstado.DISPONIBLE, conjunto);
+        final Vivienda vivienda = Vivienda.create(
+                UUID.randomUUID(), "a-101",
+                ViviendaTipo.CASA,
+                ViviendaEstado.DISPONIBLE,
+                conjunto);
 
         assertEquals("A-101", vivienda.getNumero());
     }
@@ -33,7 +42,11 @@ class ViviendaTest {
 
     @Test
     void shouldFailWhenConjuntoMissing() {
-        assertThrows(DomainException.class, () -> Vivienda.create(UUID.randomUUID(), "101", ViviendaTipo.CASA,
-                ViviendaEstado.DISPONIBLE, null));
+        assertThrows(DomainException.class, () -> Vivienda.create(
+                UUID.randomUUID(),
+                "101",
+                ViviendaTipo.CASA,
+                ViviendaEstado.DISPONIBLE,
+                null));
     }
 }

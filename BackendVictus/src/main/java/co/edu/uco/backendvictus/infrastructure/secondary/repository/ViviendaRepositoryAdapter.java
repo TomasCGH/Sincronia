@@ -8,7 +8,7 @@ import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoRepository
 import co.edu.uco.backendvictus.domain.model.Vivienda;
 import co.edu.uco.backendvictus.domain.model.ViviendaEstado;
 import co.edu.uco.backendvictus.domain.model.ViviendaTipo;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.port.ViviendaRepository;
 import co.edu.uco.backendvictus.infrastructure.secondary.entity.ViviendaEntity;
 import co.edu.uco.backendvictus.infrastructure.secondary.mapper.ViviendaEntityMapper;

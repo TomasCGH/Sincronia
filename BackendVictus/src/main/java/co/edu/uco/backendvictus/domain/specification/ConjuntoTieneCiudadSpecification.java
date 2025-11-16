@@ -1,7 +1,7 @@
 package co.edu.uco.backendvictus.domain.specification;
 
 import co.edu.uco.backendvictus.domain.model.Ciudad;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 
 /**
  * Ensures that a residential complex is linked to a valid city hierarchy.

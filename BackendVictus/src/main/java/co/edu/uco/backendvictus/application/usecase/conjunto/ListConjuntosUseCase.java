@@ -13,7 +13,7 @@ import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoResponse;
 import co.edu.uco.backendvictus.application.dto.common.PageResponse;
 import co.edu.uco.backendvictus.application.mapper.ConjuntoApplicationMapper;
 import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoRepositoryPort;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 
 @Service
 public class ListConjuntosUseCase {

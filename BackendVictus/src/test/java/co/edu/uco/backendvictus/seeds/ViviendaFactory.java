@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import co.edu.uco.backendvictus.domain.model.Administrador;
 import co.edu.uco.backendvictus.domain.model.Ciudad;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.model.Departamento;
 import co.edu.uco.backendvictus.domain.model.Pais;
 import co.edu.uco.backendvictus.domain.model.Vivienda;

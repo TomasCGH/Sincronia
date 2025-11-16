@@ -1,6 +1,7 @@
 package co.edu.uco.backendvictus.infrastructure.secondary.database;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
+// Agregados para Administrador
+import co.edu.uco.backendvictus.application.dto.administrador.AdministradorCatalogResponse;
+import co.edu.uco.backendvictus.application.dto.administrador.AdministradorEvento;
+import co.edu.uco.backendvictus.application.port.out.administrador.AdministradorEventoPublisher;
+
 /**
  * Listener reactivo que se conecta a PostgreSQL usando LISTEN/NOTIFY y re-publica
  * los eventos a los publishers SSE.
@@ -48,6 +54,7 @@ public class PostgresNotifyListener {
     private final ConjuntoEventoPublisher conjuntoPublisher;
     private final DepartamentoEventoPublisher departamentoPublisher;
     private final CiudadEventoPublisher ciudadPublisher;
+    private final AdministradorEventoPublisher administradorPublisher;
 
     private Disposable subscription;
 
@@ -55,12 +62,14 @@ public class PostgresNotifyListener {
             final ObjectMapper objectMapper,
             final ConjuntoEventoPublisher conjuntoPublisher,
             final DepartamentoEventoPublisher departamentoPublisher,
-            final CiudadEventoPublisher ciudadPublisher) {
+            final CiudadEventoPublisher ciudadPublisher,
+            final AdministradorEventoPublisher administradorPublisher) {
         this.connectionFactory = connectionFactory;
         this.objectMapper = objectMapper;
         this.conjuntoPublisher = conjuntoPublisher;
         this.departamentoPublisher = departamentoPublisher;
         this.ciudadPublisher = ciudadPublisher;
+        this.administradorPublisher = administradorPublisher;
     }
 
     @PostConstruct
@@ -149,13 +158,48 @@ public class PostgresNotifyListener {
                 yield ciudadPublisher.publish(CiudadEvento.of(tipo, data));
             }
             case CH_ADMIN -> {
-                LOGGER.info("[LISTEN] Evento de administrador recibido: {}", dataNode);
-                yield Mono.empty();
+                // Construcción de DTO de catálogo desde el row JSON del trigger
+                try {
+                    final UUID id = dataNode.path("id").isMissingNode() || dataNode.path("id").isNull()
+                            ? null : UUID.fromString(dataNode.path("id").asText());
+                    final String pNombre = textOrNull(dataNode, "primer_nombre");
+                    final String sNombre = textOrNull(dataNode, "segundo_nombre");
+                    final String pApellido = textOrNull(dataNode, "primer_apellido");
+                    final String sApellido = textOrNull(dataNode, "segundo_apellido");
+                    final String correo = textOrNull(dataNode, "correo");
+                    final String telefono = textOrNull(dataNode, "telefono");
+
+                    final String nombreCompleto = compactNombre(pNombre, sNombre, pApellido, sApellido);
+                    final AdministradorCatalogResponse data = new AdministradorCatalogResponse(
+                            id, nombreCompleto, correo, telefono);
+
+                    yield administradorPublisher.publish(new AdministradorEvento(tipo.name(), data));
+                } catch (Exception ex) {
+                    LOGGER.error("[LISTEN] Error mapeando evento de administrador", ex);
+                    yield Mono.empty();
+                }
             }
             default -> {
                 LOGGER.warn("[LISTEN] Canal no reconocido: {}", channel);
                 yield Mono.empty();
             }
         };
+    }
+
+    // Utilidades locales para normalizar nombres
+    private static String textOrNull(final JsonNode node, final String field) {
+        final JsonNode v = node.path(field);
+        return (v.isMissingNode() || v.isNull()) ? null : v.asText();
+    }
+
+    private static String compactNombre(final String... partes) {
+        final StringBuilder sb = new StringBuilder();
+        for (String p : partes) {
+            if (p != null && !p.isBlank()) {
+                if (sb.length() > 0) sb.append(' ');
+                sb.append(p.trim());
+            }
+        }
+        return sb.toString().trim();
     }
 }

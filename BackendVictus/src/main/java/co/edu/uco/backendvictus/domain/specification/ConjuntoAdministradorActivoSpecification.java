@@ -1,6 +1,6 @@
 package co.edu.uco.backendvictus.domain.specification;
 
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 
 /**
  * Validates that the residential complex is linked to an active administrator.

@@ -2,7 +2,7 @@ package co.edu.uco.backendvictus.infrastructure.secondary.mapper;
 
 import org.springframework.stereotype.Component;
 
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.model.Vivienda;
 import co.edu.uco.backendvictus.domain.model.ViviendaEstado;
 import co.edu.uco.backendvictus.domain.model.ViviendaTipo;

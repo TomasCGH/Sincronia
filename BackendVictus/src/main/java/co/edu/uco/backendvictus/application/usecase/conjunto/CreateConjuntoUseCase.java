@@ -19,7 +19,7 @@ import co.edu.uco.backendvictus.crosscutting.helpers.LoggerHelper;
 
 import co.edu.uco.backendvictus.domain.model.Administrador;
 import co.edu.uco.backendvictus.domain.model.Ciudad;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.port.AdministradorRepository;
 import co.edu.uco.backendvictus.domain.port.CiudadRepository;
 import co.edu.uco.backendvictus.infrastructure.secondary.client.MessageClient;

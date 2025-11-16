@@ -17,7 +17,7 @@ import co.edu.uco.backendvictus.application.dto.vivienda.ViviendaFilterRequest;
 import co.edu.uco.backendvictus.application.dto.vivienda.ViviendaUpdateRequest;
 import co.edu.uco.backendvictus.application.mapper.ViviendaApplicationMapper;
 import co.edu.uco.backendvictus.crosscutting.exception.ApplicationException;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.model.Vivienda;
 import co.edu.uco.backendvictus.domain.model.ViviendaEstado;
 import co.edu.uco.backendvictus.domain.model.ViviendaTipo;

@@ -11,9 +11,6 @@ import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoEventoPubl
 import co.edu.uco.backendvictus.application.port.out.conjunto.ConjuntoRepositoryPort;
 import co.edu.uco.backendvictus.application.usecase.UseCase;
 import co.edu.uco.backendvictus.crosscutting.exception.ApplicationException;
-import co.edu.uco.backendvictus.domain.model.Administrador;
-import co.edu.uco.backendvictus.domain.model.Ciudad;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.port.AdministradorRepository;
 import co.edu.uco.backendvictus.domain.port.CiudadRepository;
 

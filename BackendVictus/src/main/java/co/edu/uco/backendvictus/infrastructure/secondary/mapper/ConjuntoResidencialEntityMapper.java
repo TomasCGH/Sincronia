@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import co.edu.uco.backendvictus.domain.model.Administrador;
 import co.edu.uco.backendvictus.domain.model.Ciudad;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import co.edu.uco.backendvictus.infrastructure.secondary.entity.ConjuntoResidencialEntity;
 
 @Component

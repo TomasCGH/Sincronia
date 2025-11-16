@@ -2,7 +2,7 @@ package co.edu.uco.backendvictus.application.port.out.conjunto;
 
 import java.util.UUID;
 
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

@@ -13,7 +13,7 @@ import co.edu.uco.backendvictus.application.usecase.UseCase;
 import co.edu.uco.backendvictus.crosscutting.exception.ApplicationException;
 import co.edu.uco.backendvictus.crosscutting.helpers.LoggerHelper;
 import co.edu.uco.backendvictus.domain.model.Vivienda;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.port.ViviendaRepository;
 import co.edu.uco.backendvictus.infrastructure.secondary.client.MessageClient;
 import co.edu.uco.backendvictus.infrastructure.secondary.client.ParameterClient;

@@ -9,7 +9,7 @@ import co.edu.uco.backendvictus.application.dto.vivienda.ViviendaChangeEstadoReq
 import co.edu.uco.backendvictus.application.dto.vivienda.ViviendaCreateRequest;
 import co.edu.uco.backendvictus.application.dto.vivienda.ViviendaResponse;
 import co.edu.uco.backendvictus.application.dto.vivienda.ViviendaUpdateRequest;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.model.Vivienda;
 import co.edu.uco.backendvictus.domain.model.ViviendaEstado;
 import co.edu.uco.backendvictus.domain.model.ViviendaTipo;

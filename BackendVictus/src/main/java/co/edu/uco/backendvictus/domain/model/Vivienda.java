@@ -3,7 +3,6 @@ package co.edu.uco.backendvictus.domain.model;
 import java.util.UUID;
 
 import co.edu.uco.backendvictus.crosscutting.helpers.ValidationUtils;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
 import co.edu.uco.backendvictus.domain.specification.SpecificationValidator;
 import co.edu.uco.backendvictus.domain.specification.ViviendaTieneConjuntoSpecification;
 

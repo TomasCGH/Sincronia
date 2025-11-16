@@ -10,7 +10,7 @@ import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoResponse;
 import co.edu.uco.backendvictus.application.dto.conjunto.ConjuntoUpdateRequest;
 import co.edu.uco.backendvictus.domain.model.Administrador;
 import co.edu.uco.backendvictus.domain.model.Ciudad;
-import co.edu.uco.backendvictus.domain.model.conjunto.ConjuntoResidencial;
+import co.edu.uco.backendvictus.domain.model.ConjuntoResidencial;
 
 @Mapper(componentModel = "spring")
 public abstract class ConjuntoApplicationMapper {
