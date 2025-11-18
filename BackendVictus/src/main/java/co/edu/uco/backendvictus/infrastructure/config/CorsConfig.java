@@ -9,20 +9,15 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @EnableWebFlux
 public class CorsConfig implements WebFluxConfigurer {
 
-    private static final String FRONTEND_ORIGIN = "http://localhost:5174";
-
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins(FRONTEND_ORIGIN)
+        // Aplicar CORS a todas las rutas para evitar 403 por paths no cubiertos (p. ej. /uco/**)
+        registry.addMapping("/**")
+                // En desarrollo, permitir cualquier origen. En producción, reemplazar por dominios específicos.
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
-                .allowedHeaders("Content-Type", "Authorization")
-                .allowCredentials(false);
-        registry.addMapping("/uco-challenge/**")
-                .allowedOrigins(FRONTEND_ORIGIN)
-                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
-                .allowedHeaders("Content-Type", "Authorization")
+                // Permitir todos los headers para evitar fallos de preflight por encabezados personalizados
+                .allowedHeaders("*")
                 .allowCredentials(false);
     }
 }
-
