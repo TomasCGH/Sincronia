@@ -11,13 +11,10 @@ public class CorsConfig implements WebFluxConfigurer {
 
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
-        // Aplicar CORS a todas las rutas para evitar 403 por paths no cubiertos (p. ej. /uco/**)
-        registry.addMapping("/**")
-                // En desarrollo, permitir cualquier origen. En producción, reemplazar por dominios específicos.
-                .allowedOriginPatterns("*")
-                .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
-                // Permitir todos los headers para evitar fallos de preflight por encabezados personalizados
-                .allowedHeaders("*")
-                .allowCredentials(false);
+        registry.addMapping("/**") // Aplica CORS a TODAS las rutas
+                .allowedOriginPatterns("*") // En producción reemplazar por dominio fijo
+                .allowedMethods("*") // Permitimos todos los métodos
+                .allowedHeaders("*") // Permitimos todos los headers (evita fallos preflight)
+                .allowCredentials(false); // En WebFlux debe ser false si usas "*"
     }
 }
